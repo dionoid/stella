@@ -147,6 +147,7 @@ string DebuggerParser::exec(const FSNode& file, StringList* history)
         break;
 
       ++execDepth;
+      buf << '[' << command << "]: ";
       const string resultRun = run(command);
       if(!resultRun.empty() && resultRun != "_EXIT_DEBUGGER" && resultRun != "_NO_PROMPT")
         buf << resultRun << '\n';
