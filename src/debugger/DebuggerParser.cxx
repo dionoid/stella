@@ -132,7 +132,7 @@ string DebuggerParser::run(string_view command)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 string DebuggerParser::exec(const FSNode& file, StringList* history)
 {
-  const bool logExec = settings.getBool("dbg.exec.log");
+  const bool logExec = settings.getBool("dbg.logexec");
 
   if(file.exists())
   {
