@@ -149,6 +149,11 @@ string DebuggerParser::exec(const FSNode& file, StringList* history)
       if(!getline(in, command))
         break;
 
+      // skip empty/comment lines
+      command = BSPF::trim(command);
+      if(command.empty() || command[0] == ';')
+        continue;
+
       ++execDepth;
       if(logExec)
       {
@@ -169,19 +174,17 @@ string DebuggerParser::exec(const FSNode& file, StringList* history)
       count++;
     }
 
-    // Write execution log if enabled
+    // write execution log if enabled
     if(logExec && !execResultBuf.str().empty())
     {
-      const string logPath = file.getPath() + ".output.txt";
-      const FSNode logNode(logPath);
+      const FSNode logNode(file.getPath() + ".output.txt");
       try
       {
         logNode.write(execResultBuf);
       }
       catch(...)
       {
-        // Log write failure should not prevent script execution
-        buf << "\nWarning: Unable to write log file to " << logNode.getShortPath() << '\n';
+        buf << "\nWarning: Unable to write exec output to " << logNode.getShortPath() << '\n';
       }
     }
 
