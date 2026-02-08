@@ -157,11 +157,10 @@ string DebuggerParser::exec(const FSNode& file, StringList* history)
       ++execDepth;
       if(logExec)
       {
-        execResultBuf << '[' << command << "]";
+        execResultBuf << '[' << command << "]\n";
         const string resultRun = run(command);
         if(!resultRun.empty() && resultRun != "_EXIT_DEBUGGER" && resultRun != "_NO_PROMPT")
-          execResultBuf << ": " << resultRun;
-        execResultBuf << '\n';
+          execResultBuf << resultRun << '\n';
       }
       else
       {
