@@ -132,6 +132,8 @@ string DebuggerParser::run(string_view command)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 string DebuggerParser::exec(const FSNode& file, StringList* history)
 {
+  const bool logExec = settings.getBool("dbg.exec.log");
+
   if(file.exists())
   {
     stringstream in;
@@ -139,6 +141,7 @@ string DebuggerParser::exec(const FSNode& file, StringList* history)
     catch(...) { return red("script file \'" + file.getShortPath() + "\' not found"); }
 
     ostringstream buf;
+    stringstream execResultBuf;
     int count = 0;
     string command;
     while( !in.eof() )
@@ -147,16 +150,42 @@ string DebuggerParser::exec(const FSNode& file, StringList* history)
         break;
 
       ++execDepth;
-      buf << '[' << command << "]:";
-      const string resultRun = run(command);
-      if(!resultRun.empty() && resultRun != "_EXIT_DEBUGGER" && resultRun != "_NO_PROMPT")
-        buf << ' ' << resultRun;
-      buf << '\n';
+      if(logExec)
+      {
+        execResultBuf << '[' << command << "]";
+        const string resultRun = run(command);
+        if(!resultRun.empty() && resultRun != "_EXIT_DEBUGGER" && resultRun != "_NO_PROMPT")
+          execResultBuf << ": " << resultRun;
+        execResultBuf << '\n';
+      }
+      else
+      {
+        run(command);
+      }
       --execDepth;
+
       if (history != nullptr)
         history->push_back(command);
       count++;
     }
+
+    // Write execution log if enabled
+    if(logExec && !execResultBuf.str().empty())
+    {
+      const string logPath = file.getPath() + ".output.txt";
+      const FSNode logNode(logPath);
+      try
+      {
+        logNode.write(execResultBuf);
+      }
+      catch(...)
+      {
+        // Log write failure should not prevent script execution
+        buf << "\nWarning: Unable to write log file to " << logNode.getShortPath() << '\n';
+      }
+    }
+
+
     buf << "\nExecuted " << count << " command" << (count != 1 ? "s" : "") << " from \""
         << file.getShortPath() << "\"";
 

@@ -168,7 +168,7 @@ void Debugger::exit(bool exitrom)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 string Debugger::autoExec(StringList* history)
 {
-  stringstream buf;
+  ostringstream buf;
 
   // autoexec.script is always run
   const FSNode autoexec(myOSystem.baseDir().getPath() + "autoexec.script");
@@ -190,10 +190,6 @@ string Debugger::autoExec(StringList* history)
     else
       cerr << "ERROR in builtin function!\n";
   }
-
-  // save output to file
-  const FSNode outputFile(myOSystem.userDir().getPath() + "debug_script_output.txt");
-  outputFile.write(buf);
 
   return buf.str();
 }
