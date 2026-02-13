@@ -180,6 +180,14 @@ string Debugger::autoExec(StringList* history)
   const FSNode romname(path);
   buf << myParser->exec(romname, history) << '\n';
 
+  // Also, script passed via -dbg.script command line parameter
+  const string scriptFile = myOSystem.settings().getString("dbg.script");
+  if(!scriptFile.empty())
+  {
+    const FSNode script(scriptFile);
+    buf << myParser->exec(script, history) << '\n';
+  }
+
   // Init builtins
   for(const auto& func: ourBuiltinFunctions)
   {
