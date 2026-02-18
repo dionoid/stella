@@ -168,6 +168,7 @@ void Debugger::exit(bool exitrom)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 string Debugger::autoExec(StringList* history)
 {
+  cerr << "DEBUG: autoExec() called\n";
   ostringstream buf;
 
   // autoexec.script is always run
@@ -182,10 +183,18 @@ string Debugger::autoExec(StringList* history)
 
   // Also, script passed via -dbg.script command line parameter
   const string scriptFile = myOSystem.settings().getString("dbg.script");
+  cerr << "DEBUG: dbg.script setting = '" << scriptFile << "'\n";
   if(!scriptFile.empty())
   {
     const FSNode script(scriptFile);
-    buf << myParser->exec(script, history) << '\n';
+    cerr << "DEBUG: FSNode path = '" << script.getPath() << "', exists = " << script.exists() << "\n";
+    const string result = myParser->exec(script, history);
+    cerr << "DEBUG: exec result = '" << result << "'\n";
+    buf << result << '\n';
+  }
+  else
+  {
+    cerr << "DEBUG: dbg.script setting is empty\n";
   }
 
   // Init builtins
